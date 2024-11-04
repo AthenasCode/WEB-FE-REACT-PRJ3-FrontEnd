@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <header>
+    <header className="bg-blue-900 p-4">
       <nav>
-        <h1>
-          Esto es un header
-        </h1>
+      <h1 className="text-white text-lg">
+        Header
+      </h1>
         <Link
                 to ="/AddClient"
-                className="hover-button"
+                className="hover-button text-white text-lg"
                 style={{
                   display: "flex",
                   alignItems: "center",
