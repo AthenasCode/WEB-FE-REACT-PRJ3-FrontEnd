@@ -49,6 +49,7 @@ function Home() {
 
         return (
           <div className="flex gap-2 mt-3">
+            <Link to={`/edit-client/${client.id}`} style={{ textDecoration: "none" }}>
             <button
               style={{
                 height: "30px",
@@ -60,12 +61,10 @@ function Home() {
               }}
               className="rounded flex items-center justify-center transition-all duration-200"
               disabled={!client.active}
-              onClick={() => {
-                /* Add edit functionality here */
-              }}
             >
               Editar
             </button>
+          </Link>
             <Link
               to={`/client/${params.row.id}`}
               style={{ textDecoration: "none" }}
