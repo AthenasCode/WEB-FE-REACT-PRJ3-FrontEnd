@@ -6,7 +6,7 @@ export const Main = ({ children }: { children: React.ReactNode }) => {
     <>
       <div >
         <Header />
-        <main className="flex justify-center items-center min-h-screen bg-gray-100">
+        <main className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
           {children}
         </main>
         <Footer />

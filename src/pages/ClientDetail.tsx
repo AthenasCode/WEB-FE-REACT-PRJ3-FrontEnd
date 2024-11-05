@@ -29,9 +29,9 @@ const ClientDetail = () => {
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             onClick={() => navigate(-1)}
           >
-            Regresar
+            ‹ Regresar
           </button>
-          <h1 className="text-2xl font-bold mb-4 flex items-center">
+          <h1 className="text-2xl font-bold mb-4 flex items-center mb-0">
             Información de: {client.name}
           </h1>
         </div>
@@ -63,7 +63,7 @@ const ClientDetail = () => {
             </tr>
           </tbody>
         </table>
-        <h1 className="text-2xl font-bold mb-4 flex items-center">
+        <h1 className="text-2xl font-bold mb-4 flex items-center mt-4 mb-4">
           Contactos:
         </h1>
         {client.contacts.length === 0 ? ( // Check if there are no contacts

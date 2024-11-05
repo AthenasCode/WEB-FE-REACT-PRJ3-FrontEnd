@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Header = () => {
   return (
     <header className="bg-blue-900 p-4">
-      <nav>
+      <nav className="flex justify-between">
       <h1 className="text-white text-lg">
         Header
       </h1>

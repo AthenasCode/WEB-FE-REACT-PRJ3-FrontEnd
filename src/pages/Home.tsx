@@ -34,15 +34,15 @@ function Home() {
   };
   const columns: GridColDef[] = [
     { field: "nit", headerName: "Nit", width: 100 },
-    { field: "name", headerName: "Name", width: 140 },
-    { field: "direction", headerName: "Direction", width: 150 },
-    { field: "city", headerName: "City", width: 100 },
-    { field: "country", headerName: "Country", width: 100 },
+    { field: "name", headerName: "Nombre", width: 140 },
+    { field: "direction", headerName: "Direccion", width: 150 },
+    { field: "city", headerName: "Ciudad", width: 100 },
+    { field: "country", headerName: "Pais", width: 100 },
     { field: "email", headerName: "Email", width: 150 },
-    { field: "active", headerName: "Active", width: 80 },
+    { field: "active", headerName: "Activo", width: 80 },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: "Acciones",
       width: 300,
       renderCell: (params) => {
         const client: ClientType = params.row;
@@ -71,8 +71,8 @@ function Home() {
               style={{ textDecoration: "none" }}
             >
               <button
-                style={{ height: "30px", width: "70px" }}
-                className="bg-blue-400 text-black rounded flex items-center justify-center"
+                style={{ height: "30px", width: "70px", color: "white" }}
+                className="bg-blue-400 rounded flex items-center justify-center"
               >
                 Ver Info
               </button>
@@ -88,7 +88,7 @@ function Home() {
               className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
               onClick={() => toggleActiveStatus(client.id)}
             >
-              {client.active ? "Inactivar" : "Activar"}
+              {client.active ? "Desactivar" : "Activar"}
             </button>
           </div>
         );
@@ -115,7 +115,7 @@ function Home() {
       <div className="inlineblock" style={{ padding: "10px 0" }}>
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-center text-2xl text-blue-900 font-bold">
-            Customer List
+            Lista de clientes
           </h1>
         </div>
         <DataGrid
