@@ -2,14 +2,14 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetClients } from "../hooks/useGetClients";
 import { Main } from "../layout/Main";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 type ContactType = {
   firstname: string;
   lastName: string;
   email: string;
-  phoneNumber?: string;
+  phoneNumber: string; // Si necesitas mostrar el número de teléfono también
 };
-
 type ClientType = {
   id: string;
   nit: string;
@@ -22,18 +22,9 @@ type ClientType = {
   contacts: ContactType[];
 };
 
-const Home = () => {
+function Home() {
   const { data: clientsData } = useGetClients();
-
-  const [clients, setClients] = useState<ClientType[]>(() => {
-    const storedClients = localStorage.getItem("clients");
-    return storedClients ? JSON.parse(storedClients) : clientsData || [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("clients", JSON.stringify(clients));
-  }, [clients]);
-
+  const [clients, setClients] = useState<ClientType[]>([]);
   const toggleActiveStatus = (id: string) => {
     setClients((prevClients) =>
       prevClients.map((client) =>
@@ -41,7 +32,6 @@ const Home = () => {
       )
     );
   };
-
   const columns: GridColDef[] = [
     { field: "nit", headerName: "Nit", width: 100 },
     { field: "name", headerName: "Name", width: 140 },
@@ -49,38 +39,7 @@ const Home = () => {
     { field: "city", headerName: "City", width: 100 },
     { field: "country", headerName: "Country", width: 100 },
     { field: "email", headerName: "Email", width: 150 },
-    { 
-      field: "active", 
-      headerName: "Active", 
-      width: 80,
-      renderCell: (params) => (
-        <span style={{ color: params.value ? "black" : "red" }}>
-          {params.value ? "Active" : "Inactive"}
-        </span>
-      ),
-    },
-    {
-      field: "contacts",
-      headerName: "Contacts",
-      width: 250,
-      renderCell: (params) => {
-        const contacts: ContactType[] = params.value || [];
-        
-        if (!contacts.length) {
-          return <div>No contacts available</div>;
-        }
-
-        return (
-          <div>
-            {contacts.map((contact: ContactType, index: number) => (
-              <div key={index}>
-                {contact.firstname} {contact.lastName} - {contact.email}
-              </div>
-            ))}
-          </div>
-        );
-      },
-    },
+    { field: "active", headerName: "Active", width: 80 },
     {
       field: "actions",
       headerName: "Actions",
@@ -94,22 +53,39 @@ const Home = () => {
               style={{
                 height: "30px",
                 width: "70px",
-                backgroundColor: client.active ? "#6b5b95" : "#a9a9a9", // morado claro o gris
+                backgroundColor: client.active ? "#6b5b95" : "#a9a9a9",
                 color: "white",
+                cursor: client.active ? "pointer" : "not-allowed",
+                opacity: client.active ? 1 : 0.6,
               }}
-              className="text-black rounded flex items-center justify-center"
+              className="rounded flex items-center justify-center transition-all duration-200"
               disabled={!client.active}
+              onClick={() => {
+                /* Add edit functionality here */
+              }}
             >
               Editar
             </button>
+            <Link
+              to={`/client/${params.row.id}`}
+              style={{ textDecoration: "none" }}
+            >
+              <button
+                style={{ height: "30px", width: "70px" }}
+                className="bg-blue-400 text-black rounded flex items-center justify-center"
+              >
+                Ver Info
+              </button>
+            </Link>
             <button
               style={{
                 height: "30px",
                 width: "110px",
-                backgroundColor: client.active ? "#ff6f61" : "#88b04b", // naranja o verde
+                backgroundColor: client.active ? "#ff6f61" : "#88b04b",
                 color: "white",
+                cursor: "pointer",
               }}
-              className="text-black rounded flex items-center justify-center"
+              className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
               onClick={() => toggleActiveStatus(client.id)}
             >
               {client.active ? "Inactivar" : "Activar"}
@@ -120,15 +96,31 @@ const Home = () => {
     },
   ];
 
+  useEffect(() => {
+    // First, check if we have new data from the query
+    if (clientsData) {
+      setClients(clientsData);
+      localStorage.setItem("clients", JSON.stringify(clientsData));
+    } else {
+      // If no query data, try to load from localStorage
+      const storedClients = localStorage.getItem("clients");
+      if (storedClients) {
+        setClients(JSON.parse(storedClients));
+      }
+    }
+  }, [clientsData]);
+
   return (
     <Main>
       <div className="inlineblock" style={{ padding: "10px 0" }}>
-        <h1 className="text-center text-2xl text-blue-900 font-bold">
-          Customer List
-        </h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-center text-2xl text-blue-900 font-bold">
+            Customer List
+          </h1>
+        </div>
         <DataGrid
           columns={columns}
-          rows={clients}
+          rows={clients || []}
           getRowClassName={(params) =>
             params.row.active ? "" : "inactive-row"
           }
@@ -137,6 +129,6 @@ const Home = () => {
       </div>
     </Main>
   );
-};
+}
 
 export default Home;
