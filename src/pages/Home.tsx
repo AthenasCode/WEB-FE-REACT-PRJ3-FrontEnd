@@ -49,22 +49,25 @@ function Home() {
 
         return (
           <div className="flex gap-2 mt-3">
-            <Link to={`/edit-client/${client.id}`} style={{ textDecoration: "none" }}>
-            <button
-              style={{
-                height: "30px",
-                width: "70px",
-                backgroundColor: client.active ? "#6b5b95" : "#a9a9a9",
-                color: "white",
-                cursor: client.active ? "pointer" : "not-allowed",
-                opacity: client.active ? 1 : 0.6,
-              }}
-              className="rounded flex items-center justify-center transition-all duration-200"
-              disabled={!client.active}
+            <Link
+              to={`/edit-client/${client.id}`}
+              style={{ textDecoration: "none" }}
             >
-              Editar
-            </button>
-          </Link>
+              <button
+                style={{
+                  height: "30px",
+                  width: "70px",
+                  backgroundColor: client.active ? "#6b5b95" : "#a9a9a9",
+                  color: "white",
+                  cursor: client.active ? "pointer" : "not-allowed",
+                  opacity: client.active ? 1 : 0.6,
+                }}
+                className="rounded flex items-center justify-center transition-all duration-200"
+                disabled={!client.active}
+              >
+                Editar
+              </button>
+            </Link>
             <Link
               to={`/client/${params.row.id}`}
               style={{ textDecoration: "none" }}
@@ -113,17 +116,21 @@ function Home() {
     <Main>
       <div className="inlineblock" style={{ padding: "10px 0" }}>
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-center text-2xl text-blue-900 font-bold">
-            Lista de clientes
-          </h1>
+          <h1 className="text-center text-2xl font-bold">Lista de clientes</h1>
         </div>
+        <Link
+          to="/AddClient"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
+        >
+          + Añadir Cliente
+        </Link>
         <DataGrid
           columns={columns}
           rows={clients || []}
           getRowClassName={(params) =>
             params.row.active ? "" : "inactive-row"
           }
-          style={{ marginTop: "10px" }}
+          className="mt-10 p-6 bg-white rounded-lg shadow-md"
         />
       </div>
     </Main>

@@ -26,7 +26,7 @@ const ClientDetail = () => {
       <div className="container mx-auto p-4">
         <div className="flex items-center mb-4 gap-4">
           <button 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
             onClick={() => navigate(-1)}
           >
             ‹ Regresar

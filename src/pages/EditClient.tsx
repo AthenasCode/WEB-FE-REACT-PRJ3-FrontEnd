@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useGetClientById } from "../hooks/useGetClientById"; 
 import { useUpdateClient } from "../hooks/useUpdateClient"; 
 import { Main } from "../layout/Main";
