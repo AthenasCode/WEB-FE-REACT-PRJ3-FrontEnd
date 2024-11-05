@@ -1,13 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetcher } from "../services/api"; // Ensure you have the fetcher function
-import {
-  ReactElement,
-  JSXElementConstructor,
-  ReactNode,
-  ReactPortal,
-  Key,
-} from "react";
+import { fetcher } from "../services/api";
+import { Key } from "react";
 import { Main } from "../layout/Main";
 
 const ClientDetail = () => {
