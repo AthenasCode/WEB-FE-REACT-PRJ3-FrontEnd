@@ -1,95 +1,111 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetcher } from "../services/api";
-import { Key } from "react";
 import { Main } from "../layout/Main";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Button } from "@mui/material";
+import { useGetOpportByClientId } from "../hooks/useGetOpportByClientId";
+import { useGetClientById } from "../hooks/useGetClientById";
+import { OpportunityType } from "../hooks/useCreateOpportunity";
 
 const ClientDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const clientId = Number(id); 
   const navigate = useNavigate();
 
   const {
     data: client,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["client", id],
-    queryFn: () => fetcher(`/clients/${id}/`),
-    enabled: !!id, // Only run the query if id is defined
-  });
+    isLoading: isClientLoading,
+    isError: isClientError,
+  } = useGetClientById(clientId);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching client information.</div>;
+  const {
+    data: opportunitiesData,
+    isLoading: isOpportunitiesLoading,
+    isError: isOpportunitiesError,
+  } = useGetOpportByClientId(clientId);
+
+  const opportunities = opportunitiesData ?? [];
+
+  const columns: GridColDef[] = [
+    { field: "business_name", headerName: "Nombre del Negocio", width: 200 },
+    { field: "business_line", headerName: "Línea de Negocio", width: 180 },
+    { field: "opportunity_description", headerName: "Descripción", width: 250 },
+    { field: "estimated_value", headerName: "Valor Estimado", width: 150 },
+    { field: "estimated_date", headerName: "Fecha Estimada", width: 150 },
+    { field: "status", headerName: "Estado", width: 120 },
+    {
+      field: "actions",
+      headerName: "Acciones",
+      width: 150,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => console.log(`Seguimiento de la oportunidad ${params.row.id}`)}
+        >
+          Seguimiento
+        </Button>
+      ),
+    },
+  ];
+
+  if (isClientLoading) return <div>Loading...</div>;
+  if (isClientError || !client) return <div>Error fetching client information.</div>;
 
   return (
     <Main>
       <div className="container mx-auto p-4">
         <div className="flex items-center mb-4 gap-4">
-          <button 
+          <button
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
             onClick={() => navigate(-1)}
           >
             ‹ Regresar
           </button>
           <h1 className="text-2xl font-bold mb-4 flex items-center mb-0">
-            Información de: {client.name}
+            Información de: {client?.name}
           </h1>
         </div>
         <table className="min-w-full bg-white shadow-md rounded-lg p-4">
           <tbody>
             <tr>
               <td className="py-3 px-4 font-semibold">NIT:</td>
-              <td className="py-3 px-4">{client.nit}</td>
+              <td className="py-3 px-4">{client?.nit}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-semibold">Direccion:</td>
-              <td className="py-3 px-4">{client.direction}</td>
+              <td className="py-3 px-4">{client?.direction}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-semibold">Ciudad:</td>
-              <td className="py-3 px-4">{client.city}</td>
+              <td className="py-3 px-4">{client?.city}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-semibold">Pais:</td>
-              <td className="py-3 px-4">{client.country}</td>
+              <td className="py-3 px-4">{client?.country}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-semibold">Email:</td>
-              <td className="py-3 px-4">{client.email}</td>
+              <td className="py-3 px-4">{client?.email}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-semibold">Activo:</td>
-              <td className="py-3 px-4">{client.active ? "Si" : "No"}</td>
+              <td className="py-3 px-4">{client?.active ? "Si" : "No"}</td>
             </tr>
           </tbody>
         </table>
-        <h1 className="text-2xl font-bold mb-4 flex items-center mt-4 mb-4">
-          Contactos:
-        </h1>
-        {client.contacts.length === 0 ? ( // Check if there are no contacts
-          <h1 className="text-xl font-bold text-red-500">No hay contactos para este cliente.</h1> // Display message
+        <h1 className="text-2xl font-bold mb-4 mt-4">Oportunidades del cliente</h1>
+        {isOpportunitiesLoading ? (
+          <div>Loading opportunities...</div>
+        ) : isOpportunitiesError ? (
+          <div>Error loading opportunities</div>
         ) : (
-          <div className="client-detail grid grid-cols-1 gap-4">
-            {client.contacts.map(
-              (
-                contact: {
-                  firstname: string | null | undefined;
-                  lastName: string | null | undefined;
-                  email: string | null | undefined;
-                  phoneNumber: string | null | undefined;
-                },
-                index: Key | null | undefined
-              ) => (
-                <div key={index} className="bg-white shadow-md rounded-lg p-4 flex items-center">
-                  <img src="https://via.placeholder.com/150" alt={`${contact.firstname} ${contact.lastName}`} className="w-32 h-32 object-cover rounded-lg mr-4" />
-                  <div>
-                    <h1 className="text-xl font-bold">{contact.firstname} {contact.lastName}</h1>
-                    <p className="text-gray-600">Telefono: {contact.phoneNumber}</p>
-                    <p className="text-gray-600">E-mail: {contact.email}</p>
-                  </div>
-                </div>
-              )
-            )}
+          <div style={{ height: 400, width: "100%" }} className="mt-4">
+            <DataGrid
+              columns={columns}
+              rows={opportunities as OpportunityType[]}
+              getRowId={(row) => row.id}
+              className="bg-white shadow-md rounded-lg"
+            />
           </div>
         )}
       </div>
