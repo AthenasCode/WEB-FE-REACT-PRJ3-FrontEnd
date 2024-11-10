@@ -9,6 +9,7 @@ export const Main = ({ children }: { children: React.ReactNode }) => {
         <main className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
           {children}
         </main>
+
         <Footer />
       </div>
     </>
