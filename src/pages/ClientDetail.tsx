@@ -1,15 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Main } from "../layout/Main";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Box, Button, Modal, Typography } from "@mui/material";
 import { useGetOpportByClientId } from "../hooks/useGetOpportByClientId";
 import { useGetClientById } from "../hooks/useGetClientById";
 import { OpportunityType } from "../hooks/useCreateOpportunity";
+import { useState } from "react";
+import OpportunityFollowupsTable from "../components/OpportunityFollowupsTable";
 
 const ClientDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const clientId = Number(id); 
+  const clientId = Number(id);
   const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState<any | null>(
+    null
+  );
 
   const {
     data: client,
@@ -24,6 +31,16 @@ const ClientDetail = () => {
   } = useGetOpportByClientId(clientId);
 
   const opportunities = opportunitiesData ?? [];
+
+  const handleModalOpen = (info: any) => {
+    setSelectedOpportunity(info);
+    setOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setOpen(false);
+    setSelectedOpportunity(null);
+  };
 
   const columns: GridColDef[] = [
     { field: "business_name", headerName: "Nombre del Negocio", width: 200 },
@@ -40,7 +57,7 @@ const ClientDetail = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => console.log(`Seguimiento de la oportunidad ${params.row.id}`)}
+          onClick={() => handleModalOpen(params.row)}
         >
           Seguimiento
         </Button>
@@ -49,7 +66,8 @@ const ClientDetail = () => {
   ];
 
   if (isClientLoading) return <div>Loading...</div>;
-  if (isClientError || !client) return <div>Error fetching client information.</div>;
+  if (isClientError || !client)
+    return <div>Error fetching client information.</div>;
 
   return (
     <Main>
@@ -93,7 +111,9 @@ const ClientDetail = () => {
             </tr>
           </tbody>
         </table>
-        <h1 className="text-2xl font-bold mb-4 mt-4">Oportunidades del cliente</h1>
+        <h1 className="text-2xl font-bold mb-4 mt-4">
+          Oportunidades del cliente
+        </h1>
         {isOpportunitiesLoading ? (
           <div>Loading opportunities...</div>
         ) : isOpportunitiesError ? (
@@ -108,6 +128,50 @@ const ClientDetail = () => {
             />
           </div>
         )}
+        <Modal
+          open={open}
+          onClose={handleModalClose}
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 900,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            {selectedOpportunity && (
+              <>
+                <Typography
+                  id="modal-title"
+                  variant="h6"
+                  component="h2"
+                  gutterBottom
+                >
+                  Detalles de la Oportunidad:{" "}
+                  {selectedOpportunity.business_name}
+                </Typography>
+                <OpportunityFollowupsTable
+                  opportunity_id={selectedOpportunity.id}
+                ></OpportunityFollowupsTable>
+              </>
+            )}
+            <Button
+              onClick={handleModalClose}
+              variant="contained"
+              sx={{ mt: 2 }}
+            >
+              Cerrar
+            </Button>
+          </Box>
+        </Modal>
       </div>
     </Main>
   );
