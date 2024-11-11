@@ -9,3 +9,4 @@ export type OpportunityType = {
   estimated_date: string; // Si deseas manejar esto como Date, puedes convertirlo después
   status: string;
 };
+

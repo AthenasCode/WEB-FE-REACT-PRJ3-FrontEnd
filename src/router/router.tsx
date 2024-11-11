@@ -3,6 +3,7 @@ import AddClient from "../pages/AddClient";
 import Home from "../pages/Home";
 import ClientDetail from "../pages/ClientDetail";
 import EditClient from "../pages/EditClient";
+import Opport from "../pages/Opport";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -19,5 +20,9 @@ export const router = createBrowserRouter([
   {
     path: "/edit-client/:id",
     element: <EditClient />,
+  },
+  {
+    path: "opport", // Ruta para la página de oportunidades
+    element: <Opport />,
   },
 ]);

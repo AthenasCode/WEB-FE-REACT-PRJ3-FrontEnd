@@ -12,6 +12,12 @@ const Header = () => {
           >
            Home
           </Link>
+          <Link
+            to="/opport"
+            className="hover-button text-white text-lg flex content-center font-bold h-100"
+          >
+           Lista Oportunidades
+          </Link>
         </div>
       </nav>
     </header>

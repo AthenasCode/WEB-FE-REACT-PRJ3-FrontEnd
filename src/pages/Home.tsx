@@ -8,7 +8,7 @@ type ContactType = {
   firstname: string;
   lastName: string;
   email: string;
-  phoneNumber: string; // Si necesitas mostrar el número de teléfono también
+  phoneNumber: string; 
 };
 type ClientType = {
   id: string;
