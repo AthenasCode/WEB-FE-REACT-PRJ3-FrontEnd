@@ -2,14 +2,6 @@ import React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOppFollowups } from "../hooks/useGetOppFollowups";
 
-type ClientContact = {
-  firstname: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-};
-
-
 
 type OpportunityFollowupsTableProps = {
   opportunity_id: number;
