@@ -10,7 +10,7 @@ const Header = () => {
             to="/"
             className="hover-button text-white text-lg flex content-center font-bold h-100"
           >
-           Home
+           Lista Clientes
           </Link>
           <Link
             to="/opport"

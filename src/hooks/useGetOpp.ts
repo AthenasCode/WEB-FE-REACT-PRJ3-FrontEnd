@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { getOpp } from "../services/oppService";
+import { getOpps } from "../services/opportunityServices";
 
 export const useGetOpp = () => {
     return useQuery({
       queryKey: ["opportunities"],
       queryFn: async () => {
-        const data = await getOpp();
+        const data = await getOpps();
         console.log("Datos en useQuery:", data); // <-- Aquí
         return data;
       },

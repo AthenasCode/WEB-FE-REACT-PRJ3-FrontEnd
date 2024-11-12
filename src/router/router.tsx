@@ -5,6 +5,7 @@ import ClientDetail from "../pages/ClientDetail";
 import EditClient from "../pages/EditClient";
 import Opport from "../pages/Opport";
 import AddOpportunity from "../pages/AddOpportunity"; // Asegúrate de que este archivo esté disponible
+import UpdateOpportunity from "../pages/UpdateOpportunity";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +29,11 @@ export const router = createBrowserRouter([
     element: <Opport />,
   },
   {
-    path: "/add-opportunity", // Ruta para la creación de oportunidades
-    element: <AddOpportunity />, // Esta es la página donde el usuario podrá crear nuevas oportunidades
+    path: "/AddOpportunity",
+    element: <AddOpportunity />,
+  },
+  {
+    path: "/edit-opportunity/:id",
+    element: <UpdateOpportunity />,
   },
 ]);

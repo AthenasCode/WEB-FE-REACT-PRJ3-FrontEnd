@@ -1,4 +1,5 @@
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addOpportunity } from "../services/opportunityServices";
 export type OpportunityType = {
   id: number;
   client_id: number;
@@ -10,3 +11,12 @@ export type OpportunityType = {
   status: string;
 };
 
+export const useCreateOpportunity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (opportunity: OpportunityType) => addOpportunity(opportunity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["oppo"] });
+    },
+  });
+};
