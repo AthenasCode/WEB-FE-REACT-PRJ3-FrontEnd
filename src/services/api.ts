@@ -11,10 +11,20 @@ export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
     },
   });
 
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage || "An error occurred");
+  let responseBody;
+  try {
+    responseBody = await response.json(); // Intenta parsear como JSON
+  } catch (error) {
+    responseBody = await response.text(); // Si falla, asume que es texto plano
   }
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(
+      typeof responseBody === "string"
+        ? responseBody // Muestra texto si es texto plano
+        : responseBody?.message || "An error occurred"
+    );
+  }
+
+  return responseBody;
 };

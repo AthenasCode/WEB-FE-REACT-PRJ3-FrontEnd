@@ -1,18 +1,33 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOpp } from "../hooks/useGetOpp";
-import { Main } from '../layout/Main';
+import { useDeleteOpportunity } from "../hooks/useDeleteOpp";
+import { Main } from "../layout/Main";
 import { useNavigate } from "react-router-dom";
 
 function Opport() {
-  const { data: opportunities } = useGetOpp();
+  const { data: opportunities, refetch } = useGetOpp(); // Refetch para actualizar datos
+  const { mutateAsync: deleteOpportunity } = useDeleteOpportunity(); // Cambiamos a `mutateAsync` para usar `await`
   const navigate = useNavigate();
 
   const handleCreateOpportunity = () => {
     navigate("/AddOpportunity");
   };
 
-  const handleUpdateOpportunity = (id: any) => {
+  const handleUpdateOpportunity = (id: number) => {
     navigate(`/edit-opportunity/${id}`);
+  };
+
+  const handleDeleteOpportunity = async (id: number) => {
+    const isConfirmed = window.confirm("¿Está seguro de que desea eliminar esta oportunidad?");
+    if (isConfirmed) {
+      try {
+        await deleteOpportunity(id); // Eliminación de la oportunidad
+        await refetch(); // Actualiza los datos tras la eliminación
+        console.log("Oportunidad eliminada y datos actualizados");
+      } catch (error) {
+        console.error("Error al eliminar la oportunidad:", error);
+      }
+    }
   };
 
   const columns: GridColDef[] = [
@@ -30,18 +45,19 @@ function Opport() {
       width: 200,
       renderCell: (params) => (
         <div className="flex gap-1 mt-2">
-          <button 
-              style={{ height: '30px', width: '70px' }} 
-              className="bg-blue-400 text-black rounded flex items-center justify-center"
-              onClick={() => handleUpdateOpportunity(params.row.id)}
+          <button
+            style={{ height: "30px", width: "70px" }}
+            className="bg-blue-400 text-black rounded flex items-center justify-center"
+            onClick={() => handleUpdateOpportunity(params.row.id)}
           >
-              Actualizar
+            Actualizar
           </button>
-          <button 
-              style={{ height: '30px', width: '110px' }} 
-              className="bg-red-400 text-black rounded flex items-center justify-center"
+          <button
+            style={{ height: "30px", width: "110px" }}
+            className="bg-red-400 text-black rounded flex items-center justify-center"
+            onClick={() => handleDeleteOpportunity(params.row.id)}
           >
-              Eliminar
+            Eliminar
           </button>
         </div>
       ),
@@ -50,7 +66,10 @@ function Opport() {
 
   return (
     <Main>
-      <div className="inlineblock" style={{ padding: '10px 0', maxWidth: '2000px', margin: '0 auto' }}>
+      <div
+        className="inlineblock"
+        style={{ padding: "10px 0", maxWidth: "2000px", margin: "0 auto" }}
+      >
         <h1 className="text-center text-2xl text-blue-900 font-bold">Lista de oportunidades</h1>
         <button
           onClick={handleCreateOpportunity}
@@ -62,7 +81,7 @@ function Opport() {
           columns={columns}
           rows={opportunities || []}
           autoHeight
-          style={{ marginTop: '10px' }}
+          style={{ marginTop: "10px" }}
         />
       </div>
     </Main>
