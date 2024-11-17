@@ -2,7 +2,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOpp } from "../hooks/useGetOpp";
 import { useDeleteOpportunity } from "../hooks/useDeleteOpp";
 import { Main } from "../layout/Main";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Opport() {
   const { data: opportunities, refetch } = useGetOpp(); // Refetch para actualizar datos
@@ -31,14 +31,24 @@ function Opport() {
   };
 
   const columns: GridColDef[] = [
-    { field: "client_id", headerName: "Client Id", width: 80 },
-    { field: "business_name", headerName: "Business Name", width: 220 },
+    {
+      field: "business_name",
+      headerName: "Business Name",
+      width: 220,
+      renderCell: (params) => (
+        <Link
+          to={`/opp/${params.row.id}`}
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          {params.value}
+        </Link>
+      ),
+    },
     { field: "business_line", headerName: "Business Line", width: 120 },
-    { field: "opportunity_description", headerName: "Opportunity Description", width: 400 },
+    { field: "opportunity_description", headerName: "Opportunity Description", width: 280 },
     { field: "estimated_value", headerName: "Estimated Value", width: 130 },
     { field: "estimated_date", headerName: "Estimated Date", width: 130 },
     { field: "status", headerName: "Status", width: 90 },
-    { field: "id", headerName: "Id", width: 70 },
     {
       field: "actions",
       headerName: "Actions",
@@ -80,8 +90,7 @@ function Opport() {
         <DataGrid
           columns={columns}
           rows={opportunities || []}
-          autoHeight
-          style={{ marginTop: "10px" }}
+          className="mt-10 p-6 bg-white rounded-lg shadow-md"
         />
       </div>
     </Main>
