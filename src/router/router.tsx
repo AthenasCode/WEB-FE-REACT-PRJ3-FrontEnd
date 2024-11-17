@@ -6,6 +6,7 @@ import EditClient from "../pages/EditClient";
 import Opport from "../pages/Opport";
 import AddOpportunity from "../pages/AddOpportunity"; // Asegúrate de que este archivo esté disponible
 import UpdateOpportunity from "../pages/UpdateOpportunity";
+import OppDetail from "../pages/OppDetail";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
   {
     path: "/edit-client/:id",
     element: <EditClient />,
+  },
+  {
+    path: "/opp/:id",
+    element: <OppDetail/>
   },
   {
     path: "/opport", // Ruta para la página de oportunidades

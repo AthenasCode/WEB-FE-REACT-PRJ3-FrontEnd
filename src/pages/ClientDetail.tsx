@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Main } from "../layout/Main";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Modal, Typography } from "@mui/material";
@@ -43,7 +43,19 @@ const ClientDetail = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: "business_name", headerName: "Nombre del Negocio", width: 200 },
+    {
+      field: "business_name",
+      headerName: "Business Name",
+      width: 220,
+      renderCell: (params) => (
+        <Link
+          to={`/opp/${params.row.id}`}
+          className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        >
+          {params.value}
+        </Link>
+      ),
+    },
     { field: "business_line", headerName: "Línea de Negocio", width: 180 },
     { field: "opportunity_description", headerName: "Descripción", width: 250 },
     { field: "estimated_value", headerName: "Valor Estimado", width: 150 },
@@ -156,7 +168,12 @@ const ClientDetail = () => {
                   gutterBottom
                 >
                   Detalles de la Oportunidad:{" "}
-                  {selectedOpportunity.business_name}
+                  <Link
+                    to={`/opp/${selectedOpportunity.id}`}
+                    className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                  >
+                    {selectedOpportunity.business_name}
+                  </Link>
                 </Typography>
                 <OpportunityFollowupsTable
                   opportunity_id={selectedOpportunity.id}
