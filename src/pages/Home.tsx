@@ -115,9 +115,7 @@ function Home() {
   return (
     <Main>
       <div className="inlineblock" style={{ padding: "10px 0" }}>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-center text-2xl font-bold">Lista de clientes</h1>
-        </div>
+      <h1 className="text-center text-2xl text-blue-900 font-bold mb-3">Lista de Clientes</h1>
         <Link
           to="/AddClient"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"

@@ -1,5 +1,5 @@
 import { OpportunityType } from "../hooks/useCreateOpportunity";
-
+import { Followup } from "../hooks/types";
 import { fetcher } from "./api";
 
 export const getOpportByClientId = async (client_id: number) => {
@@ -13,17 +13,17 @@ export const getOpportByClientId = async (client_id: number) => {
     throw new Error("Error al obtener los datos del cliente");
   }
 };
-export const getOpportunityFollowups = async (opportunity_id: number) => {
+export const getOpportunityFollowups = async (opportunity_id: number): Promise<Followup[]> => {
   try {
     const response = await fetcher(`/followups?opportunity_id=${opportunity_id}`, {
       method: "GET",
     });
-    return response;
+    return response; 
   } catch (error) {
-    console.error("Error al obtener las oportunidades del cliente:", error);
-    throw new Error("Error al obtener los datos del cliente");
-  }  
-}
+    console.error("Error al obtener los seguimientos:", error);
+    throw new Error("Error al obtener los seguimientos");
+  }
+};
 
 export const updateOpportunity = async (opportunity: OpportunityType) => {
   try {
