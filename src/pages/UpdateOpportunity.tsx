@@ -1,40 +1,30 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useUpdateOpportunity } from "../hooks/useUpdateOpportunity"; // Cambia a tu hook de actualización
 import { useGetOpportunityById } from "../hooks/useGetOpportunityById"; // Hook para obtener la oportunidad existente
 import { Main } from "../layout/Main";
 import { OpportunityType } from "../hooks/useCreateOpportunity"; // Asegúrate de definir este tipo en un archivo separado si no lo tienes
 import { useParams } from "react-router-dom";
 
+
+
 function UpdateOpportunity() {
-  const { id } = useParams<{ id: string }>();
-  const opportunityId = parseInt(id as string, 10);
+  const { id } = useParams<{ id: string }>(); 
+  const opportunityId = parseInt(id as string, 10); 
   const { data: opportunityData } = useGetOpportunityById(opportunityId); // Cargar los datos actuales
   const { mutate: updateOpportunity, isSuccess, isError } = useUpdateOpportunity();
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<OpportunityType>();
-  const [statusOptions, setStatusOptions] = useState<string[]>([]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<OpportunityType>();
 
-  // Filtrar opciones del estado según el estado actual de la oportunidad
+  // Cargar datos iniciales de la oportunidad
   useEffect(() => {
     if (opportunityData) {
       reset(opportunityData); // Rellenar el formulario con datos actuales
-      switch (opportunityData.status) {
-        case "Apertura":
-          setStatusOptions(["Apertura", "En Estudio"]);
-          break;
-        case "En Estudio":
-          setStatusOptions(["En Estudio", "Orden de Compra"]);
-          break;
-        case "Orden de Compra":
-          setStatusOptions(["Orden de Compra", "Finalizada"]);
-          break;
-        case "Finalizada":
-          setStatusOptions(["Finalizada"]);
-          break;
-        default:
-          setStatusOptions(["Apertura"]);
-      }
     }
   }, [opportunityData, reset]);
 
@@ -66,6 +56,7 @@ function UpdateOpportunity() {
           )}
 
           <div className="space-y-4">
+
             {/* Campos editables de la oportunidad */}
             <div>
               <label htmlFor="business_name" className="block text-gray-700 font-medium">
@@ -141,9 +132,10 @@ function UpdateOpportunity() {
                 className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                 {...register("status", { required: true })}
               >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
+                <option value="Apertura">Apertura</option>
+                <option value="En Estudio">En Estudio</option>
+                <option value="Orden de Compra">Orden de Compra</option>
+                <option value="Finalizada">Finalizada</option>
               </select>
               {errors.status && <p className="text-red-500 text-xs mt-1">Campo obligatorio</p>}
             </div>
