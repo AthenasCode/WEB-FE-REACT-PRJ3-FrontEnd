@@ -3,26 +3,8 @@ import { useGetOpportunityById } from "../hooks/useGetOpportunityById";
 import { Main } from "../layout/Main";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOppFollowups } from "../hooks/useGetOppFollowups";
-interface Followup {
-  opportunity_id: number;
-  contact_date: string;
-  contact_type: string;
-  followup_description: string;
-  executive: string;
-  client_contact: {
-    firstname: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-  };
-}
 
-type ContactType = {
-  firstname: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string; 
-};
+
 
 const OppDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,7 +54,7 @@ const OppDetail = () => {
       field: "actions",
       headerName: "Actions",
       width: 300,
-      renderCell: (params) => (
+      renderCell: () => (
         <>
           <div className="flex gap-2 mt-3">
             <button 
