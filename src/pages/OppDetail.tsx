@@ -3,12 +3,15 @@ import { useGetOpportunityById } from "../hooks/useGetOpportunityById";
 import { Main } from "../layout/Main";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOppFollowups } from "../hooks/useGetOppFollowups";
-
+import { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { useUpdateFollow } from "../hooks/useUpdateFollow"; 
 
 
 const OppDetail = () => {
   const { id } = useParams<{ id: string }>();
   const opportunity_id = id ? parseInt(id, 10) : null;
+  const { mutate: updateFollow } = useUpdateFollow();
 
   if (!opportunity_id) {
     return <div>Error: ID de oportunidad inválido</div>;
@@ -17,14 +20,50 @@ const OppDetail = () => {
   const { data: opportunity, isLoading: isOpportunityLoading, isError: isOpportunityError } =
     useGetOpportunityById(opportunity_id || 0);
 
-  const { data: followups, isLoading: isFollowupsLoading, isError: isFollowupsError } =
+  const { data: followups, isLoading: isFollowupsLoading, isError: isFollowupsError, refetch } =
     useGetOppFollowups(opportunity_id || 0);
 
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [selectedFollowup, setSelectedFollowup] = useState<any>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   if (isOpportunityLoading || isFollowupsLoading) return <div>Loading...</div>;
   if (isOpportunityError) return <div>Error fetching opportunity details</div>;
   if (isFollowupsError) return <div>Error fetching followups</div>;
+
+  const handleOpenDialog = (followup: any) => {
+    
+    setSelectedFollowup(followup);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedFollowup(null);
+    setFormError(null);
+  };
+
+  const handleSaveChanges = () => {
+    // Ejecutar la mutación para actualizar el seguimiento
+    updateFollow(selectedFollowup, {
+      onSuccess: () => {
+        refetch(); // Refrescar la tabla de seguimientos
+        handleCloseDialog(); // Cerrar el cuadro de diálogo
+      },
+      onError: (error: any) => {
+        console.error("Error al actualizar el seguimiento:", error);
+        // Mostrar mensaje de error en el formulario
+        setFormError(
+          error.response?.data?.message || // Para axios o fetch con respuestas enriquecidas
+          "Error al actualizar el seguimiento. Por favor, inténtelo nuevamente."
+        );
+      },
+    });
+  };
+  const handleInputChange = (field: string, value: string) => {
+    setSelectedFollowup({ ...selectedFollowup, [field]: value });
+  };
 
   const columns: GridColDef[] = [
     { field: "opportunity_id", headerName: "Id Oportunidad", width: 120 },
@@ -37,12 +76,12 @@ const OppDetail = () => {
       headerName: "Contacto del Cliente",
       width: 300,
       renderCell: (params) => {
-        const contact = params.value; // Esto ya debe ser un objeto, no un array
-        
+        const contact = params.value;
+
         if (!contact) {
-          return <div>No contacts available</div>; 
+          return <div>No contacts available</div>;
         }
-    
+
         return (
           <div>
             {contact.firstname} {contact.lastName} - {contact.email}
@@ -54,34 +93,33 @@ const OppDetail = () => {
       field: "actions",
       headerName: "Actions",
       width: 300,
-      renderCell: () => (
-        <>
-          <div className="flex gap-2 mt-3">
-            <button 
-                style={{
-                  height: "30px",
-                  width: "110px",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-                className="bg-blue-400 rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
-            >
-                Actualizar
-            </button>
-            <button 
-                style={{
-                  height: "30px",
-                  width: "110px",
-                  backgroundColor: "#ff6f61",
-                  color: "white",
-                  cursor: "pointer",
-                }}
-                className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
-            >
-                Eliminar
-            </button>
-          </div>
-        </>
+      renderCell: (params) => (
+        <div className="flex gap-2 mt-3">
+          <button
+            style={{
+              height: "30px",
+              width: "110px",
+              color: "white",
+              cursor: "pointer",
+            }}
+            className="bg-blue-400 rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
+            onClick={() => handleOpenDialog(params.row)}
+          >
+            Actualizar
+          </button>
+          <button
+            style={{
+              height: "30px",
+              width: "110px",
+              backgroundColor: "#ff6f61",
+              color: "white",
+              cursor: "pointer",
+            }}
+            className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
+          >
+            Eliminar
+          </button>
+        </div>
       ),
     },
   ];
@@ -149,12 +187,16 @@ const OppDetail = () => {
                 </tr>
               </tbody>
             </table>
-            <h2 style={{color: "bg-blue-900",
-                }} className="text-blue-900 text-2xl font-bold mt-5">Actividades de Seguimiento</h2>
+            <h2
+              style={{ color: "bg-blue-900" }}
+              className="text-blue-900 text-2xl font-bold mt-5"
+            >
+              Actividades de Seguimiento
+            </h2>
             {followups && followups.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
-                  rows={followups || []} // followups debe ser un array de Followup
+                  rows={followups || []}
                   columns={columns}
                   className="mt-5 p-6 bg-white rounded-lg shadow-md"
                 />
@@ -162,10 +204,58 @@ const OppDetail = () => {
             ) : (
               <div>No hay actividades de seguimiento para esta oportunidad.</div>
             )}
-            
           </div>
         </Main>
       )}
+
+      {/* Cuadro de diálogo */}
+      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Actualizar Actividad de Seguimiento</DialogTitle>
+        <DialogContent>
+          {formError && <div className="text-red-500 mb-3">{formError}</div>}
+          {selectedFollowup && (
+            <>
+              <TextField
+                label="Fecha"
+                type="date"
+                fullWidth
+                value={selectedFollowup.contact_date || ""}
+                onChange={(e) => handleInputChange("contact_date", e.target.value)}
+                margin="normal"
+              />
+              <TextField
+                label="Tipo de Contacto"
+                fullWidth
+                value={selectedFollowup.contact_type || ""}
+                onChange={(e) => handleInputChange("contact_type", e.target.value)}
+                margin="normal"
+              />
+              <TextField
+                label="Descripción"
+                fullWidth
+                value={selectedFollowup.followup_description || ""}
+                onChange={(e) => handleInputChange("followup_description", e.target.value)}
+                margin="normal"
+              />
+              <TextField
+                label="Ejecutivo"
+                fullWidth
+                value={selectedFollowup.executive || ""}
+                onChange={(e) => handleInputChange("executive", e.target.value)}
+                margin="normal"
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveChanges} color="primary">
+            Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
