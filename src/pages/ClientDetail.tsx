@@ -92,7 +92,7 @@ const ClientDetail = () => {
           >
             ‹ Regresar
           </button>
-          <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center mb-0">
+          <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center">
             Información de: {client?.name}
           </h1>
         </div>
@@ -124,7 +124,39 @@ const ClientDetail = () => {
             </tr>
           </tbody>
         </table>
-        <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center mb-0">
+        <h1 className="text-2xl font-bold mb-4 text-blue-900 mt-4 flex items-center">
+          Contactos:
+        </h1>
+        {client.contacts.length === 0 ? ( // Check if there are no contacts
+          <h1 className="text-xl font-bold text-red-500">
+            No hay contactos para este cliente.
+          </h1> // Display message
+        ) : (
+          <div className="client-detail grid grid-cols-1 gap-4">
+            {client.contacts.map((contact: any, index: number) => (
+              <div
+                key={index}
+                className="bg-white shadow-md rounded-lg p-4 flex items-center"
+              >
+                <img
+                  src="https://via.placeholder.com/150"
+                  alt={`${contact.firstname} ${contact.lastName}`}
+                  className="w-32 h-32 object-cover rounded-lg mr-4"
+                />
+                <div>
+                  <h1 className="text-xl font-bold">
+                    {contact.firstname} {contact.lastName}
+                  </h1>
+                  <p className="text-gray-600">
+                    Telefono: {contact.phoneNumber}
+                  </p>
+                  <p className="text-gray-600">E-mail: {contact.email}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <h1 className="text-blue-900 text-2xl font-bold mt-4 mb-4 flex items-center">
           Oportunidades del cliente
         </h1>
         {isOpportunitiesLoading ? (
