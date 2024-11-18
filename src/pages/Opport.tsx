@@ -56,15 +56,21 @@ function Opport() {
       renderCell: (params) => (
         <div className="flex gap-1 mt-2">
           <button
-            style={{ height: "30px", width: "70px" }}
-            className="bg-blue-400 text-black rounded flex items-center justify-center"
+            style={{ height: "30px", width: "70px", color: "white" }}
+                className="bg-blue-400 rounded flex items-center justify-center"
             onClick={() => handleUpdateOpportunity(params.row.id)}
           >
             Actualizar
           </button>
           <button
-            style={{ height: "30px", width: "110px" }}
-            className="bg-red-400 text-black rounded flex items-center justify-center"
+            style={{
+              height: "30px",
+              width: "110px",
+              backgroundColor: "#ff6f61"  ,
+              color: "white",
+              cursor: "pointer",
+            }}
+            className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
             onClick={() => handleDeleteOpportunity(params.row.id)}
           >
             Eliminar
@@ -83,9 +89,9 @@ function Opport() {
         <h1 className="text-center text-2xl text-blue-900 font-bold">Lista de oportunidades</h1>
         <button
           onClick={handleCreateOpportunity}
-          className="bg-blue-500 text-white py-2 px-4 rounded mt-6"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
         >
-          Crear Oportunidad
+          + Crear Oportunidad
         </button>
         <DataGrid
           columns={columns}

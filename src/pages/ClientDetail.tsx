@@ -3,6 +3,7 @@ import { Main } from "../layout/Main";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useGetOpportByClientId } from "../hooks/useGetOpportByClientId";
+
 import { useGetClientById } from "../hooks/useGetClientById";
 import { OpportunityType } from "../hooks/useCreateOpportunity";
 import { useState } from "react";
@@ -91,7 +92,7 @@ const ClientDetail = () => {
           >
             ‹ Regresar
           </button>
-          <h1 className="text-2xl font-bold mb-4 flex items-center mb-0">
+          <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center mb-0">
             Información de: {client?.name}
           </h1>
         </div>
@@ -123,7 +124,7 @@ const ClientDetail = () => {
             </tr>
           </tbody>
         </table>
-        <h1 className="text-2xl font-bold mb-4 mt-4">
+        <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center mb-0">
           Oportunidades del cliente
         </h1>
         {isOpportunitiesLoading ? (
