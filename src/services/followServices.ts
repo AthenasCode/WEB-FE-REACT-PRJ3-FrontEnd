@@ -11,4 +11,8 @@ export const updateFollow = async (follow: FollowType) => {
       console.log(error);
       throw new Error("Error al actualizar el followe");
     }
+  } 
+  export const createFollow = async (follow: Omit<FollowType, 'id'>) => {
+    const { data } = await api.post("/followups", follow);
+    return data;
   };
