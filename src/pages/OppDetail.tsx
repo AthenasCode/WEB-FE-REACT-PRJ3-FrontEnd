@@ -115,8 +115,11 @@ const OppDetail = () => {
   };
 
 
-  const handleInputChange = (field: string, value: string) => {
-    setSelectedFollowup({ ...selectedFollowup, [field]: value });
+  const handleInputChange = (field: keyof any, value: any) => {
+    setSelectedFollowup((prev: any) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
   const handleInputChange2 = (field: keyof any, value: any) => {
     setcreatedFollowup((prev: any) => ({
@@ -281,6 +284,30 @@ const OppDetail = () => {
           {formError && <div className="text-red-500 mb-3">{formError}</div>}
           {selectedFollowup && (
             <>
+              <div className="mb-3">
+              <label htmlFor="client-contact" className="block text-sm font-medium text-gray-700">
+                Contacto del Cliente
+              </label>
+              <select
+                id="client-contact"
+                className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={selectedFollowup.client_contact?.email || ""}
+                onChange={(e) => {
+                  const contactos = client?.contacts
+                  const selectedContact = (contactos || []).find(
+                    (contact) => contact.email === e.target.value
+                  );
+                  handleInputChange("client_contact", selectedContact || {});
+                }}
+              >
+                <option value="">Selecciona un contacto</option>
+                {(client?.contacts || []).map((contact) => (
+                  <option key={contact.email} value={contact.email}>
+                    {contact.firstname} {contact.lastName} - {contact.email}
+                  </option>
+                ))}
+              </select>
+            </div>
               <TextField
                 label="Fecha"
                 type="date"
