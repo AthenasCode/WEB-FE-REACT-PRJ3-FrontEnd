@@ -1,5 +1,5 @@
 import { fetcher } from "./api";
-import {FollowType} from "../hooks/useUpdateFollow"
+import {FollowType} from "../hooks/useCreateFollow"
 export const updateFollow = async (follow: FollowType) => {
     try {
       const response = await fetcher(`/followups/${follow.id}`, {
@@ -12,7 +12,16 @@ export const updateFollow = async (follow: FollowType) => {
       throw new Error("Error al actualizar el followe");
     }
   } 
-  export const createFollow = async (follow: Omit<FollowType, 'id'>) => {
-    const { data } = await api.post("/followups", follow);
-    return data;
+  export const addFollow = async (follow: FollowType) => {
+    try {
+      const response = await fetcher("/followups", {
+        method: "POST",
+        body: JSON.stringify(follow),
+      });
+  
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al crear el seguimiento");
+    }
   };

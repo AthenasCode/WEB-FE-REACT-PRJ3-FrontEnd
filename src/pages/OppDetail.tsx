@@ -6,13 +6,14 @@ import { useGetOppFollowups } from "../hooks/useGetOppFollowups";
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { useUpdateFollow } from "../hooks/useUpdateFollow"; 
-
+import { useCreateFollow } from "../hooks/useCreateFollow";
+import { useGetClientById } from "../hooks/useGetClientById";
 
 const OppDetail = () => {
   const { id } = useParams<{ id: string }>();
   const opportunity_id = id ? parseInt(id, 10) : null;
   const { mutate: updateFollow } = useUpdateFollow();
-
+  const { mutate: createFollow } = useCreateFollow();
   if (!opportunity_id) {
     return <div>Error: ID de oportunidad inválido</div>;
   }
@@ -22,9 +23,21 @@ const OppDetail = () => {
 
   const { data: followups, isLoading: isFollowupsLoading, isError: isFollowupsError, refetch } =
     useGetOppFollowups(opportunity_id || 0);
-
+  const { data: client } =
+    useGetClientById(opportunity!.client_id);
+  console.log(client)
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen2, setDialogOpen2] = useState(false);
   const [selectedFollowup, setSelectedFollowup] = useState<any>(null);
+  const [createdFollowup, setcreatedFollowup] = useState<any>({
+    opportunity_id: opportunity_id,
+    contact_type: "",
+    contact_date: "",
+    client_contact:[], 
+    executive:"",
+    followup_description: ""
+  });
+
   const [formError, setFormError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -43,7 +56,15 @@ const OppDetail = () => {
     setSelectedFollowup(null);
     setFormError(null);
   };
+  const handleOpenDialog2 = () => {
+    
+    setDialogOpen2(true);
+  };
 
+  const handleCloseDialog2 = () => {
+    setDialogOpen2(false);
+    setFormError(null);
+  };
   const handleSaveChanges = () => {
     // Ejecutar la mutación para actualizar el seguimiento
     updateFollow(selectedFollowup, {
@@ -61,10 +82,35 @@ const OppDetail = () => {
       },
     });
   };
+  const handleSaveChanges2 = () => {
+    console.log(createdFollowup)
+    // Ejecutar la mutación para actualizar el seguimiento
+    createFollow(createdFollowup, {
+      onSuccess: () => {
+        refetch(); // Refrescar la tabla de seguimientos
+        handleCloseDialog2(); // Cerrar el cuadro de diálogo
+      },
+      onError: (error: any) => {
+        console.error("Error al actualizar el seguimiento:", error);
+        // Mostrar mensaje de error en el formulario
+        setFormError(
+          error.response?.data?.message || // Para axios o fetch con respuestas enriquecidas
+          "Error al actualizar el seguimiento. Por favor, inténtelo nuevamente."
+        );
+      },
+    });
+  };
+
+
   const handleInputChange = (field: string, value: string) => {
     setSelectedFollowup({ ...selectedFollowup, [field]: value });
   };
-
+  const handleInputChange2 = (field: keyof any, value: any) => {
+    setcreatedFollowup((prev: any) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
   const columns: GridColDef[] = [
     { field: "opportunity_id", headerName: "Id Oportunidad", width: 120 },
     { field: "contact_date", headerName: "Fecha", width: 150 },
@@ -193,6 +239,13 @@ const OppDetail = () => {
             >
               Actividades de Seguimiento
             </h2>
+            <button
+                    type="button"
+                    onClick={handleOpenDialog2}
+                    className="mt-4 text-red-500 hover:text-red-700 font-medium"
+                  >
+                    Crear seguimiento
+                  </button>
             {followups && followups.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
@@ -223,13 +276,22 @@ const OppDetail = () => {
                 onChange={(e) => handleInputChange("contact_date", e.target.value)}
                 margin="normal"
               />
-              <TextField
-                label="Tipo de Contacto"
-                fullWidth
-                value={selectedFollowup.contact_type || ""}
-                onChange={(e) => handleInputChange("contact_type", e.target.value)}
-                margin="normal"
-              />
+              <div className="mb-3">
+                <label htmlFor="contact-type" className="block text-sm font-medium text-gray-700">
+                  Tipo de Contacto
+                </label>
+                <select
+                  id="contact-type"
+                  className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={selectedFollowup.contact_type || ""}
+                  onChange={(e) => handleInputChange("contact_type", e.target.value)}
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="llamada">Llamada</option>
+                  <option value="correo">Correo</option>
+                  <option value="reunión presencial">Reunión Presencial</option>
+                </select>
+              </div>
               <TextField
                 label="Descripción"
                 fullWidth
@@ -253,6 +315,85 @@ const OppDetail = () => {
           </Button>
           <Button onClick={handleSaveChanges} color="primary">
             Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={isDialogOpen2} onClose={handleCloseDialog2}>
+        <DialogTitle>Crear Actividad de Seguimiento</DialogTitle>
+        <DialogContent>
+          {formError && <div className="text-red-500 mb-3">{formError}</div>}
+          { (
+            <>
+            <div className="mb-3">
+              <label htmlFor="client-contact" className="block text-sm font-medium text-gray-700">
+                Contacto del Cliente
+              </label>
+              <select
+                id="client-contact"
+                className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={createdFollowup.client_contact?.email || ""}
+                onChange={(e) => {
+                  const selectedContact = client!.contacts.find(
+                    (contact) => contact.email === e.target.value
+                  );
+                  handleInputChange2("client_contact", selectedContact || {});
+                }}
+              >
+                <option value="">Selecciona un contacto</option>
+                {client!.contacts.map((contact) => (
+                  <option key={contact.email} value={contact.email}>
+                    {contact.firstname} {contact.lastName} - {contact.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+              <TextField
+                label="Fecha"
+                type="date"
+                fullWidth
+                value={createdFollowup.contact_date || ""}
+                onChange={(e) => handleInputChange2("contact_date", e.target.value)}
+                margin="normal"
+              />
+              <div className="mb-3">
+                <label htmlFor="contact-type" className="block text-sm font-medium text-gray-700">
+                  Tipo de Contacto
+                </label>
+                <select
+                  id="contact-type"
+                  className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={createdFollowup.contact_type || ""}
+                  onChange={(e) => handleInputChange2("contact_type", e.target.value)}
+                >
+                  <option value="">Selecciona una opción</option>
+                  <option value="llamada">Llamada</option>
+                  <option value="correo">Correo</option>
+                  <option value="reunión presencial">Reunión Presencial</option>
+                </select>
+              </div>
+              <TextField
+                label="Descripción"
+                fullWidth
+                value={createdFollowup.followup_description || ""}
+                onChange={(e) => handleInputChange2("followup_description", e.target.value)}
+                margin="normal"
+              />
+              <TextField
+                label="Ejecutivo"
+                fullWidth
+                value={createdFollowup.executive || ""}
+                onChange={(e) => handleInputChange2("executive", e.target.value)}
+                margin="normal"
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog2} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveChanges2} color="primary">
+            Crear
           </Button>
         </DialogActions>
       </Dialog>

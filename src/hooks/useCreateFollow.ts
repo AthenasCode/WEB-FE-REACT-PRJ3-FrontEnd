@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFollow } from "../services/followServices";
+import { addFollow } from "../services/followServices";
 
 type ClientContact = {
   firstname: string;
@@ -22,7 +22,7 @@ export const useCreateFollow = () => {
   const queryFollow = useQueryClient();
 
   return useMutation({
-    mutationFn: (follow: Omit<FollowType, 'id'>) => createFollow(follow),
+    mutationFn: (follow: Omit<FollowType, 'id'>) => addFollow(follow),
     onSuccess: () => {
       queryFollow.invalidateQueries({ queryKey: ["follow"] });
     },
