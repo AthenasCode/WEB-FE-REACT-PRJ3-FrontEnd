@@ -12,20 +12,33 @@ import { useGetClientById } from "../hooks/useGetClientById";
 const OppDetail = () => {
   const { id } = useParams<{ id: string }>();
   const opportunity_id = id ? parseInt(id, 10) : null;
+
   const { mutate: updateFollow } = useUpdateFollow();
   const { mutate: createFollow } = useCreateFollow();
+
   if (!opportunity_id) {
     return <div>Error: ID de oportunidad inválido</div>;
   }
 
-  const { data: opportunity, isLoading: isOpportunityLoading, isError: isOpportunityError } =
-    useGetOpportunityById(opportunity_id || 0);
+  const {
+    data: opportunity,
+    isLoading: isOpportunityLoading,
+    isError: isOpportunityError,
+  } = useGetOpportunityById(opportunity_id || 0);
 
-  const { data: followups, isLoading: isFollowupsLoading, isError: isFollowupsError, refetch } =
-    useGetOppFollowups(opportunity_id || 0);
-  const { data: client } =
-    useGetClientById(opportunity!.client_id);
-  console.log(client)
+  const {
+    data: followups,
+    isLoading: isFollowupsLoading,
+    isError: isFollowupsError,
+    refetch,
+  } = useGetOppFollowups(opportunity_id || 0);
+
+  // Asegurarse de que 'opportunity' esté definido antes de usarlo
+  const client_id = opportunity?.client_id;
+
+  const { data: client } = useGetClientById(client_id || 0); // Pasar '0' o manejar el caso en que 'client_id' no esté disponible
+
+
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isDialogOpen2, setDialogOpen2] = useState(false);
   const [selectedFollowup, setSelectedFollowup] = useState<any>(null);
@@ -242,9 +255,9 @@ const OppDetail = () => {
             <button
                     type="button"
                     onClick={handleOpenDialog2}
-                    className="mt-4 text-red-500 hover:text-red-700 font-medium"
+                    className="mt-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
                   >
-                    Crear seguimiento
+                    + Añadir seguimiento
                   </button>
             {followups && followups.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
@@ -333,14 +346,15 @@ const OppDetail = () => {
                 className="mt-1 border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={createdFollowup.client_contact?.email || ""}
                 onChange={(e) => {
-                  const selectedContact = client!.contacts.find(
+                  const contactos = client?.contacts
+                  const selectedContact = (contactos || []).find(
                     (contact) => contact.email === e.target.value
                   );
                   handleInputChange2("client_contact", selectedContact || {});
                 }}
               >
                 <option value="">Selecciona un contacto</option>
-                {client!.contacts.map((contact) => (
+                {(client?.contacts || []).map((contact) => (
                   <option key={contact.email} value={contact.email}>
                     {contact.firstname} {contact.lastName} - {contact.email}
                   </option>
