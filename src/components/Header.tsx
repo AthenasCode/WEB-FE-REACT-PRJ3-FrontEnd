@@ -7,16 +7,22 @@ const Header = () => {
         <h1 className="text-white text-lg font-bold">◩ CRM</h1>
         <div className="flex gap-4">
           <Link
+            to="/dashboard"
+            className="hover-button text-white text-lg flex content-center font-bold h-100"
+          >
+            Dashboard
+          </Link>
+          <Link
             to="/"
             className="hover-button text-white text-lg flex content-center font-bold h-100"
           >
-           Lista Clientes
+            Lista Clientes
           </Link>
           <Link
             to="/opport"
             className="hover-button text-white text-lg flex content-center font-bold h-100"
           >
-           Lista Oportunidades
+            Lista Oportunidades
           </Link>
         </div>
       </nav>

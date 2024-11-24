@@ -1,16 +1,21 @@
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { useGetClients } from "../hooks/useGetClients";
+
 export function TotalValueByClientGraph(props: any) {
+    const data = Array.isArray(props.data) ? props.data : [];
+    const { data: clientsData } = useGetClients();
+
     const series = [
         {
             name: "Valor total estimado",
-            data: props.data.map(
+            data: data.map(
                 (client: { totalEstimatedValue: any }) => client.totalEstimatedValue
             ),
         },
         {
             name: "Valor total ejecutado",
-            data: props.data.map(
+            data: data.map(
                 (client: { totalExecutedValue: any }) => client.totalExecutedValue
             ),
         },
@@ -20,8 +25,11 @@ export function TotalValueByClientGraph(props: any) {
             type: "bar" as const,
         },
         xaxis: {
-            categories: props.data.map(
-                (client: { clientName: any }) => client.clientName
+            categories: data.map(
+                (client: { clientId: any }) => {
+                    const clientInfo = clientsData?.find((c: { id: any }) => c.id === client.clientId);
+                    return clientInfo ? clientInfo.name : "Desconocido";
+                }
             ),
         },
         plotOptions: {

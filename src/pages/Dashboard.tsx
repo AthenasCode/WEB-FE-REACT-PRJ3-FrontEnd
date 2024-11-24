@@ -1,14 +1,15 @@
-import { useGetTotalValueByClient } from "../hooks/useGetTotalValueByClient";
 import { Main } from "../layout/Main";
 import { TotalValueByClientGraph } from "../components/TotalValueByClientGraph";
+import { useGetOpp } from "../hooks/useGetOpp";
+import { calcTotalValueByClient } from "../utils/dashboardUtils";
 
 const Dashboard = () => {
-  const { data, error, isLoading } = useGetTotalValueByClient();
-  const graphDataTotalValueByClient = data?.totalValueByClient;
+  const { data, error, isLoading } = useGetOpp();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  const graphDataTotalValueByClient = Array.isArray(data) ? calcTotalValueByClient(data) : Promise.reject(new Error("Invalid data format"));
 
   return (
     <Main>
