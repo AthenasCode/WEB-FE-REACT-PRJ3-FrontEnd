@@ -7,6 +7,7 @@ import Opport from "../pages/Opport";
 import AddOpportunity from "../pages/AddOpportunity"; // Asegúrate de que este archivo esté disponible
 import UpdateOpportunity from "../pages/UpdateOpportunity";
 import OppDetail from "../pages/OppDetail";
+import Dashboard from "../pages/Dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -41,4 +42,8 @@ export const router = createBrowserRouter([
     path: "/edit-opportunity/:id",
     element: <UpdateOpportunity />,
   },
+  {
+    path: "/dashboard",
+    element: <Dashboard/>,
+  }
 ]);

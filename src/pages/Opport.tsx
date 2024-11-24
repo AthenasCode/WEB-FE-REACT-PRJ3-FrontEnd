@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useGetOpp } from "../hooks/useGetOpp";
 import { useDeleteOpportunity } from "../hooks/useDeleteOpp";

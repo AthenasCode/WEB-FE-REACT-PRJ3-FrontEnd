@@ -12,3 +12,22 @@ export interface Followup {
     executive: string;
     followup_description: string;
 }
+
+export interface TotalValueByClient {
+  clientId: number;
+  clientName: string;
+  totalEstimatedValue: number;
+  totalExecutedValue: number;
+}
+
+export interface DashboardData {
+  totalValueByClient: TotalValueByClient[];
+  opportunityStateDistribution: {
+    state: string;
+    count: number;
+  }[];
+  opportunityBusinessLinePercentage: {
+    businessLine: string;
+    percentage: number;
+  }[];
+}
