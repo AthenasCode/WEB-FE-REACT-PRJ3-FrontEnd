@@ -54,6 +54,7 @@ function Home() {
               style={{ textDecoration: "none" }}
             >
               <button
+                data-testid={`edit-button-${client.id}`}
                 style={{
                   height: "30px",
                   width: "70px",
