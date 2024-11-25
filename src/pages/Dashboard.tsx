@@ -1,8 +1,9 @@
 import { Main } from "../layout/Main";
 import { TotalValueByClientGraph } from "../components/TotalValueByClientGraph";
 import { OpportunitiesByBusinessLineGraph } from "../components/OpportunitiesByBusinessLineGraph";
+import { OpportunitiesByStatusGraph } from "../components/OpportunitiesByStatusGraph";
 import { useGetOpp } from "../hooks/useGetOpp";
-import { calcTotalValueByClient, calcOpportunitiesByBusinessLine } from "../utils/dashboardUtils";
+import { calcTotalValueByClient, calcOpportunitiesByBusinessLine, calcOpportunitiesByStatus } from "../utils/dashboardUtils";
 
 const Dashboard = () => {
   const { data, error, isLoading } = useGetOpp();
@@ -15,7 +16,9 @@ const Dashboard = () => {
   const graphDataOpportunitiesByBusinessLine = Array.isArray(data)
   ? calcOpportunitiesByBusinessLine(data)
   : Promise.reject(new Error("Invalid data format"));
-
+  const graphDataOpportunitiesByStatus = Array.isArray(data)
+  ? calcOpportunitiesByStatus(data)
+  : Promise.reject(new Error("Invalid data format"));
   return (
     <Main>
       <div className="flex justify-center items-center min-h-screen">
@@ -23,6 +26,7 @@ const Dashboard = () => {
           <h1 className="text-blue-900 text-2xl font-bold mb-4 flex items-center">Dashboard</h1>
           <TotalValueByClientGraph data={graphDataTotalValueByClient} />
           <OpportunitiesByBusinessLineGraph data={graphDataOpportunitiesByBusinessLine} />
+          <OpportunitiesByStatusGraph data={graphDataOpportunitiesByStatus} />
         </div>
       </div>
     </Main>

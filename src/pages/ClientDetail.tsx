@@ -138,11 +138,7 @@ const ClientDetail = () => {
                 key={index}
                 className="bg-white shadow-md rounded-lg p-4 flex items-center"
               >
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt={`${contact.firstname} ${contact.lastName}`}
-                  className="w-32 h-32 object-cover rounded-lg mr-4"
-                />
+
                 <div>
                   <h1 className="text-xl font-bold">
                     {contact.firstname} {contact.lastName}
