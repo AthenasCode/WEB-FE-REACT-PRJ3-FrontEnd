@@ -43,3 +43,22 @@ export function calcOpportunitiesByBusinessLine(data: any): any {
 
     return result;
 }
+export function calcOpportunitiesByStatus(data: any): any {
+    if (!Array.isArray(data)) {
+        return Promise.reject(new Error("Invalid data format"));
+    }
+
+    const statusCounts: Record<string, number> = {};
+
+    data.forEach((item: { status: string }) => {
+        const status = item.status || "Desconocido";
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+
+    const result = Object.entries(statusCounts).map(([status, count]) => ({
+        status,
+        count,
+    }));
+
+    return result;
+}
