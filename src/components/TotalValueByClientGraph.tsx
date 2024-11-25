@@ -61,8 +61,12 @@ export function TotalValueByClientGraph(props: any) {
                 },
             },
         },
+        title: {
+            text: "Valor Total Estimado vs Valor Total Ejecutado en Oportunidades",
+            align: "center",
+        },
     };
     return (
-        <Chart options={options} series={series} type="bar" />
+        <Chart options={options} series={series} type="bar" height={650} width={1000} />
     );
 }

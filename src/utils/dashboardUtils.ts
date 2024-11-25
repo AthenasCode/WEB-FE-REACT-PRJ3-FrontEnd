@@ -21,3 +21,25 @@ export  function calcTotalValueByClient(data: any):any {
     }
     return Object.values(result);
 }
+
+export function calcOpportunitiesByBusinessLine(data: any): any {
+    if (!Array.isArray(data)) {
+        return Promise.reject(new Error("Invalid data format"));
+    }
+
+    const totalOpportunities = data.length;
+    const businessLineCounts: Record<string, number> = {};
+
+    data.forEach((item: { business_line: string }) => {
+        const businessLine = item.business_line || "Desconocido";
+        businessLineCounts[businessLine] = (businessLineCounts[businessLine] || 0) + 1;
+    });
+
+    const result = Object.entries(businessLineCounts).map(([businessLine, count]) => ({
+        businessLine,
+        count,
+        percentage: (count / totalOpportunities) * 100,
+    }));
+
+    return result;
+}
