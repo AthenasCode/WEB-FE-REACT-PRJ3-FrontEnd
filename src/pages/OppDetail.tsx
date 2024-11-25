@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
 import { useUpdateFollow } from "../hooks/useUpdateFollow"; 
 import { useCreateFollow } from "../hooks/useCreateFollow";
+import { useDeleteFollow } from "../hooks/useDeleteFollow.ts";
 import { useGetClientById } from "../hooks/useGetClientById";
 
 const OppDetail = () => {
@@ -15,6 +16,7 @@ const OppDetail = () => {
 
   const { mutate: updateFollow } = useUpdateFollow();
   const { mutate: createFollow } = useCreateFollow();
+  const { mutate: deleteFollow } = useDeleteFollow();
 
   if (!opportunity_id) {
     return <div>Error: ID de oportunidad inválido</div>;
@@ -36,8 +38,7 @@ const OppDetail = () => {
   // Asegurarse de que 'opportunity' esté definido antes de usarlo
   const client_id = opportunity?.client_id;
 
-  const { data: client } = useGetClientById(client_id || 0); // Pasar '0' o manejar el caso en que 'client_id' no esté disponible
-
+  const { data: client } = useGetClientById(client_id || 0);
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isDialogOpen2, setDialogOpen2] = useState(false);
@@ -51,6 +52,14 @@ const OppDetail = () => {
     followup_description: ""
   });
 
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    followupToDelete: number | null;
+  }>({
+    open: false,
+    followupToDelete: null,
+  });
+
   const [formError, setFormError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -59,7 +68,6 @@ const OppDetail = () => {
   if (isFollowupsError) return <div>Error fetching followups</div>;
 
   const handleOpenDialog = (followup: any) => {
-    
     setSelectedFollowup(followup);
     setDialogOpen(true);
   };
@@ -69,8 +77,8 @@ const OppDetail = () => {
     setSelectedFollowup(null);
     setFormError(null);
   };
+
   const handleOpenDialog2 = () => {
-    
     setDialogOpen2(true);
   };
 
@@ -78,42 +86,65 @@ const OppDetail = () => {
     setDialogOpen2(false);
     setFormError(null);
   };
+
+  const handleOpenDeleteDialog = (followupId: number) => {
+    setDeleteDialog({ open: true, followupToDelete: followupId });
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialog({ open: false, followupToDelete: null });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteDialog.followupToDelete !== null) {
+      deleteFollow(deleteDialog.followupToDelete, {
+        onSuccess: () => {
+          refetch(); // Refresca la tabla de seguimientos
+          handleCloseDeleteDialog(); // Cierra el diálogo
+        },
+        onError: (error: any) => {
+          console.error("Error al eliminar el seguimiento:", error);
+          setFormError(
+            error.response?.data?.message ||
+            "Error al eliminar el seguimiento. Por favor, inténtelo nuevamente."
+          );
+        },
+      });
+    }
+  };
+
   const handleSaveChanges = () => {
-    // Ejecutar la mutación para actualizar el seguimiento
     updateFollow(selectedFollowup, {
       onSuccess: () => {
-        refetch(); // Refrescar la tabla de seguimientos
-        handleCloseDialog(); // Cerrar el cuadro de diálogo
+        refetch();
+        handleCloseDialog();
       },
       onError: (error: any) => {
         console.error("Error al actualizar el seguimiento:", error);
-        // Mostrar mensaje de error en el formulario
         setFormError(
-          error.response?.data?.message || // Para axios o fetch con respuestas enriquecidas
-          "Error al actualizar el seguimiento. Por favor, inténtelo nuevamente."
-        );
-      },
-    });
-  };
-  const handleSaveChanges2 = () => {
-    console.log(createdFollowup)
-    // Ejecutar la mutación para actualizar el seguimiento
-    createFollow(createdFollowup, {
-      onSuccess: () => {
-        refetch(); // Refrescar la tabla de seguimientos
-        handleCloseDialog2(); // Cerrar el cuadro de diálogo
-      },
-      onError: (error: any) => {
-        console.error("Error al actualizar el seguimiento:", error);
-        // Mostrar mensaje de error en el formulario
-        setFormError(
-          error.response?.data?.message || // Para axios o fetch con respuestas enriquecidas
+          error.response?.data?.message || 
           "Error al actualizar el seguimiento. Por favor, inténtelo nuevamente."
         );
       },
     });
   };
 
+  const handleSaveChanges2 = () => {
+    console.log(createdFollowup)
+    createFollow(createdFollowup, {
+      onSuccess: () => {
+        refetch();
+        handleCloseDialog2();
+      },
+      onError: (error: any) => {
+        console.error("Error al actualizar el seguimiento:", error);
+        setFormError(
+          error.response?.data?.message ||
+          "Error al actualizar el seguimiento. Por favor, inténtelo nuevamente."
+        );
+      },
+    });
+  };
 
   const handleInputChange = (field: keyof any, value: any) => {
     setSelectedFollowup((prev: any) => ({
@@ -121,12 +152,14 @@ const OppDetail = () => {
       [field]: value,
     }));
   };
+
   const handleInputChange2 = (field: keyof any, value: any) => {
     setcreatedFollowup((prev: any) => ({
       ...prev,
       [field]: value,
     }));
   };
+
   const columns: GridColDef[] = [
     { field: "opportunity_id", headerName: "Id Oportunidad", width: 120 },
     { field: "contact_date", headerName: "Fecha", width: 150 },
@@ -178,6 +211,7 @@ const OppDetail = () => {
               cursor: "pointer",
             }}
             className="rounded flex items-center justify-center transition-all duration-200 hover:opacity-90"
+            onClick={() => handleOpenDeleteDialog(params.row.id)}
           >
             Eliminar
           </button>
@@ -256,12 +290,12 @@ const OppDetail = () => {
               Actividades de Seguimiento
             </h2>
             <button
-                    type="button"
-                    onClick={handleOpenDialog2}
-                    className="mt-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
-                  >
-                    + Añadir seguimiento
-                  </button>
+              type="button"
+              onClick={handleOpenDialog2}
+              className="mt-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold"
+            >
+              + Añadir seguimiento
+            </button>
             {followups && followups.length > 0 ? (
               <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
@@ -276,6 +310,8 @@ const OppDetail = () => {
           </div>
         </Main>
       )}
+
+
 
       {/* Cuadro de diálogo */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
@@ -358,6 +394,34 @@ const OppDetail = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+          {/* Dialog de confirmación para eliminar */}
+      <Dialog open={deleteDialog.open} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirmar Eliminación</DialogTitle>
+        <DialogContent>
+          <div className="p-4">
+            ¿Estás seguro que deseas eliminar esta actividad de seguimiento? Esta acción no se puede deshacer.
+          </div>
+          {formError && (
+            <div className="text-red-500 px-4">
+              {formError}
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete} 
+            color="error"
+            variant="contained"
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>  
+
       <Dialog open={isDialogOpen2} onClose={handleCloseDialog2}>
         <DialogTitle>Crear Actividad de Seguimiento</DialogTitle>
         <DialogContent>
